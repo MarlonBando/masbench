@@ -1,6 +1,0 @@
-# masbench configuration template
-ServerPath: /path/to/server
-LevelsDir: /path/to/levels
-tBenchmarkFolder: /path/to/benchmark/folder
-ClientCommand: "python -m project.src.searchclient -greedy --max-memory 2048"
-Timeout: "180"

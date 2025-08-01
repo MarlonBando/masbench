@@ -12,7 +12,7 @@ type Config struct {
     LevelsDir        string `yaml:"LevelsDir"`
     BenchmarkFolder  string `yaml:"BenchmarkFolder"`
     ClientCommand    string `yaml:"ClientCommand"`
-    Timeout          string `yaml:"Timeout"`
+    Timeout          int    `yaml:"Timeout"`
 }
 
 var (
