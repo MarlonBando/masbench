@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"masbench/models"
+	"masbench/internals/models"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"

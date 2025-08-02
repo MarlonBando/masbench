@@ -4,7 +4,7 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
-	"masbench/models"
+	"masbench/internals/models"
 	"os"
 	"path/filepath"
 	"regexp"

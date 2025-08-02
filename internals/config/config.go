@@ -5,7 +5,7 @@ import (
 	"os"
 	"sync"
 
-	"masbench/models"
+	"masbench/internals/models"
 	"gopkg.in/yaml.v3"
 )
 

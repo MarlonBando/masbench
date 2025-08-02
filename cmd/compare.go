@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strconv"
 
-	"masbench/config"
+	"masbench/internals/config"
 	"github.com/fogleman/gg"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/spf13/cobra"

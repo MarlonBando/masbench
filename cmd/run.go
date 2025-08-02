@@ -7,8 +7,8 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	"masbench/config"
-	"masbench/parsers"
+	"masbench/internals/config"
+	"masbench/internals/parsers"
 
 	"github.com/spf13/cobra"
 )
