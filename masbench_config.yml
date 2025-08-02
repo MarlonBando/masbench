@@ -1,5 +1,0 @@
-ServerPath: path/to/your/server_executable
-LevelsDir: path/to/your/levels_directory
-BenchmarkFolder: benchmarks
-ClientCommand: your_client_command --level {level_path}
-Timeout: "180"
