@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"masbench/config"
+	"masbench/models"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v3"
@@ -58,7 +58,7 @@ func runInit() {
 }
 
 func createDefaultConfig(basePath string) {
-	defaultConfig := config.Config{
+	defaultConfig := models.Config{
 		ServerPath:      "path/to/your/server_executable",
 		LevelsDir:       "path/to/your/levels_directory",
 		BenchmarkFolder: "benchmarks",
@@ -79,7 +79,7 @@ func interactiveConfigCreation(basePath string) {
 	benchmarkFolder := askForBenchmarkFolder(reader)
 	clientCommand := askForClientCommand(reader)
 	
-	newConfig := config.Config{
+	newConfig := models.Config{
 		ServerPath:      serverPath,
 		LevelsDir:       levelsDir,
 		BenchmarkFolder: benchmarkFolder,
@@ -92,7 +92,7 @@ func interactiveConfigCreation(basePath string) {
 	fmt.Printf("%sCreated config file at %s.%s\n", colorGreen, configPath, colorReset)
 }
 
-func writeConfig(basePath string, cfg *config.Config) {
+func writeConfig(basePath string, cfg *models.Config) {
 	yamlData, err := yaml.Marshal(cfg)
 	if err != nil {
 		fmt.Printf("%sError marshalling config: %v%s\n", colorRed, err, colorReset)

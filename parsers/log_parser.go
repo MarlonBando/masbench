@@ -4,23 +4,12 @@ import (
 	"bufio"
 	"encoding/csv"
 	"fmt"
+	"masbench/models"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
 )
-
-// LevelMetrics holds the parsed data for a single level.
-type LevelMetrics struct {
-	LevelName   string
-	Solved      string
-	Actions     string
-	Time        string
-	Generated   string
-	Explored    string
-	MemoryAlloc string
-	MaxAlloc    string
-}
 
 // ParseLogToCSV parses a log file and writes the extracted metrics to a CSV file.
 func ParseLogToCSV(logFilePath string, outputFilePath string) error {
@@ -39,8 +28,8 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 	generatedPattern := regexp.MustCompile(`\[client\]\[message\] Generated: (\d+)`)
 	memoryPattern := regexp.MustCompile(`\[client\]\[message\] Alloc: ([0-9.]+) MB, MaxAlloc: ([0-9.]+) MB`)
 
-	var logs []LevelMetrics
-	var currentLevel *LevelMetrics
+	var logs []models.LevelMetrics
+	var currentLevel *models.LevelMetrics
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -51,7 +40,7 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 				logs = append(logs, *currentLevel)
 			}
 			levelName := strings.TrimSuffix(filepath.Base(levelMatch[1]), filepath.Ext(levelMatch[1]))
-			currentLevel = &LevelMetrics{LevelName: levelName}
+			currentLevel = &models.LevelMetrics{LevelName: levelName}
 		}
 
 		if currentLevel != nil {

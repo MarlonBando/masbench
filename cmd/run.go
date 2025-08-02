@@ -73,7 +73,7 @@ func runBenchmark(name string, message string) {
 		"-l", cfg.LevelsDir,
 		"-o", logServerPath,
 		"-c", cfg.ClientCommand,
-		"-t", cfg.Timeout,
+		"-t", fmt.Sprintf("%d", cfg.Timeout),
 	)
 
 	multiWriter := io.MultiWriter(os.Stdout, logFile)
