@@ -31,3 +31,5 @@ masbench
 # Editor/IDE
 # .idea/
 # .vscode/
+
+docs/build/
