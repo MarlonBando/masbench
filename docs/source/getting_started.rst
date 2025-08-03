@@ -47,10 +47,6 @@ After initialization, you'll have a ``masbench_config.yml`` file in your project
 ServerPath
 ~~~~~~~~~~
 
-.. code-block:: yaml
-
-   ServerPath: "path/to/your/server_executable.jar"
-
 This is the path to your server executable file. The server must be a ``.jar`` file.
 
 **Example:**
@@ -61,10 +57,6 @@ This is the path to your server executable file. The server must be a ``.jar`` f
 
 LevelsDir
 ~~~~~~~~~
-
-.. code-block:: yaml
-
-   LevelsDir: "path/to/your/levels_directory"
 
 This specifies the directory containing the levels you want to benchmark.
 
@@ -80,10 +72,6 @@ This specifies the directory containing the levels you want to benchmark.
 BenchmarkFolder
 ~~~~~~~~~~~~~~~
 
-.. code-block:: yaml
-
-   BenchmarkFolder: "benchmarks"
-
 This is where masbench will store all benchmark results and logs.
 If the folder does not exist, masbench will create it automatically.
 
@@ -95,10 +83,6 @@ If the folder does not exist, masbench will create it automatically.
 
 ClientCommand
 ~~~~~~~~~~~~~
-
-.. code-block:: yaml
-
-   ClientCommand: "your_client_command --level {level_path}"
 
 This is the command used to start your client. This command will be passed to the server using the ``-c`` option.
 
@@ -121,10 +105,6 @@ What masbench need is just the client command that is the one after the ``-c`` o
 
 Timeout
 ~~~~~~~
-
-.. code-block:: yaml
-
-   Timeout: 180
 
 This sets the maximum time (in seconds) that each level benchmark can run before being terminated.
 
