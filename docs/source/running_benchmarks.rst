@@ -165,7 +165,7 @@ If you get an error about the server not being found:
 3. Verify you have Java installed and available in your PATH
 
 Client Command Issues
-~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
 
 If your client fails to run:
 

@@ -23,7 +23,6 @@ to save some time.
    :maxdepth: 2
    :caption: Contents:
  
-   installation
    getting_started
    running_benchmarks
    comparison

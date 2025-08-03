@@ -78,7 +78,7 @@ Difference Report Table
 The difference report provides a detailed breakdown showing how the benchmark1 compared to benchmark2.
 If a metric is colored in green, it indicates benchmark1 outperformed benchmark2 for that metric on that level.
 
-.. image:: ../build/html/_static/table_comparison_example.png
+.. image:: _static/tablediff.png
    :alt: Example of benchmark comparison table
    :align: center
    :width: 100%
