@@ -3,15 +3,28 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-masbench documentation
+Masbench
 ======================
 
-Add your content using ``reStructuredText`` syntax. See the
-`reStructuredText <https://www.sphinx-doc.org/en/master/usage/restructuredtext/index.html>`_
-documentation for details.
+Masbench is a benchmarking tool for evaluating the performance
+of your client during the "Ai and Multi Agent System" course at DTU.
 
+I created this tool to help students like me to benchmark with ease their ides
+and to allow you to focus only on developing the best algorithm you can.
+Trust me, you need as much time as possible and hopefully this tool will help you
+to save some time.
+
+.. note::
+   I'm done with the course so most likely I won't be able to maintain this tool.
+   If you find any bug or you want to add any feature you are more than welcome to
+   contribute to the project on GitHub: https://github.com/MarlonBando/masbench
 
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
-
+ 
+   installation
+   getting_started
+   running_benchmarks
+   comparison
+   changes
