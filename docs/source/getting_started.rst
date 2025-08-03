@@ -3,6 +3,17 @@ Getting Started
 
 This guide will walk you through setting up masbench in your project and configuring it for your specific needs.
 
+Installation
+------------
+
+To install masbench:
+
+1. Download the appropriate zip file for your OS and processor from the `releases page <https://github.com/MarlonBando/masbench/releases/tag/v1.0.0>`_
+2. Unzip the downloaded file
+3. Add the extracted folder to your system PATH
+
+That's it! You can now use the ``masbench`` command from anywhere in your terminal.
+
 Initializing masbench
 ---------------------
 
