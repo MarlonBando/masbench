@@ -9,10 +9,10 @@ Masbench
 Masbench is a benchmarking tool for evaluating the performance
 of your client during the "Ai and Multi Agent System" course at DTU.
 
-I created this tool to help students like me to benchmark with ease their ides
+I created this tool to help students like me to benchmark with ease their ideas
 and to allow you to focus only on developing the best algorithm you can.
 Trust me, you need as much time as possible and hopefully this tool will help you
-to save some time.
+to save some of it.
 
 .. note::
    I'm done with the course so most likely I won't be able to maintain this tool.
