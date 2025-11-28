@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"masbench/internals/comparator"
-	"masbench/internals/config"
 	"github.com/go-gota/gota/dataframe"
 	"github.com/spf13/cobra"
+	"masbench/internals/comparator"
+	"masbench/internals/config"
 )
 
 func init() {
@@ -16,18 +16,32 @@ func init() {
 }
 
 var compareCmd = &cobra.Command{
-	Use:   "compare",
-	Short: "Compare two benchmark results",
-	Long:  `This command compares two benchmark results and create tables and graphs with the comparison.`,
+	Use:   "compare <benchmark1> <benchmark2>",
+	Short: "Compare two benchmark results and generate an interactive HTML report",
+	Long: `Compare two benchmark results and generate an interactive HTML report.
+
+This command creates a comprehensive comparison report showing how benchmark1 
+performed relative to benchmark2.
+
+The comparison is benchmark1-centric, meaning all metrics show how benchmark1 
+performed compared to benchmark2. To reverse the perspective, swap the order:
+  masbench compare benchmark2 benchmark1
+
+Examples:
+  masbench compare astar-v1 bfs-v1
+  masbench compare optimized-v2 baseline
+
+Note: Both benchmarks must exist in your configured benchmark folder.
+The generated HTML report can be opened directly in any web browser.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 2 {
 			fmt.Println(colorRed + "Error: You must provide two benchmark result files to compare." + colorReset)
 			os.Exit(1)
 		}
-	
+
 		benchmark1Name := args[0]
 		Benchmark2Name := args[1]
-		
+
 		cfg := config.GetConfig()
 
 		benchmark1Path := filepath.Join(cfg.BenchmarkFolder, benchmark1Name, fmt.Sprintf("%s_results.csv", benchmark1Name))
@@ -62,7 +76,7 @@ func compareResults(benchmark1Path, benchmark2Path, name1, name2 string) {
 
 	cfg := config.GetConfig()
 	outputDir := filepath.Join(cfg.BenchmarkFolder, "comparisons", fmt.Sprintf("%svs%s", name1, name2))
-	
+
 	// Create output directory
 	if err := os.MkdirAll(outputDir, 0755); err != nil {
 		fmt.Printf(colorRed+"Error creating output directory: %v%s\n", err, colorReset)

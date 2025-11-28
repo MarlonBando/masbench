@@ -356,6 +356,16 @@ const htmlTemplate = `<!DOCTYPE html>
                     }
                 },
                 scales: {
+                    x: {
+                        ticks: {
+                            autoSkip: false,
+                            maxRotation: 90,
+                            minRotation: 45,
+                            font: {
+                                size: 10
+                            }
+                        }
+                    },
                     y: {
                         beginAtZero: true
                     }
