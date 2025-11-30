@@ -13,7 +13,7 @@ import (
 func GenerateHTMLReport(df1, df2 dataframe.DataFrame, name1, name2, outputPath string) error {
 	report := prepareComparisonData(df1, df2, name1, name2)
 
-	tmpl, err := template.New("report").Parse(htmlTemplate)
+	tmpl, err := template.New("report").Parse(reportTemplate)
 	if err != nil {
 		return fmt.Errorf("failed to parse template: %w", err)
 	}
@@ -40,7 +40,17 @@ func prepareComparisonData(df1, df2 dataframe.DataFrame, name1, name2 string) Co
 		MetricNames:    []string{"Generated", "Explored", "MemoryAlloc", "Time", "Actions"},
 	}
 
-	df2Map := createDataFrameMap(df2)
+	df2Map := make(map[string]map[string]string)
+	for i := 0; i < df2.Nrow(); i++ {
+		levelName := df2.Elem(i, 0).String()
+		rowData := make(map[string]string)
+
+		for j, colName := range df2.Names() {
+			rowData[colName] = df2.Elem(i, j).String()
+		}
+
+		df2Map[levelName] = rowData
+	}
 
 	levelNames1 := df1.Col("LevelName").Records()
 
@@ -86,9 +96,7 @@ func prepareComparisonData(df1, df2 dataframe.DataFrame, name1, name2 string) Co
 		solved2 := getStringValueFromMap(df2Data, "Solved", exists)
 		levelComp.Solved = compareSolved(solved1, solved2)
 
-		// Override metric status based on solved status
 		if solved1 == "Yes" && solved2 == "No" {
-			// Element1 solved, Element2 didn't - everything is green (improvement)
 			levelComp.Generated.Status = "improvement"
 			levelComp.Generated.IsImprovement = true
 			levelComp.Explored.Status = "improvement"
@@ -100,7 +108,6 @@ func prepareComparisonData(df1, df2 dataframe.DataFrame, name1, name2 string) Co
 			levelComp.Actions.Status = "improvement"
 			levelComp.Actions.IsImprovement = true
 		} else if solved1 == "No" && solved2 == "Yes" {
-			// Element1 didn't solve, Element2 did - everything is red (regression)
 			levelComp.Generated.Status = "regression"
 			levelComp.Generated.IsImprovement = false
 			levelComp.Explored.Status = "regression"
@@ -170,23 +177,6 @@ func compareSolved(solved1, solved2 string) SolvedComparison {
 		Changed: changed,
 		Status:  status,
 	}
-}
-
-func createDataFrameMap(df dataframe.DataFrame) map[string]map[string]string {
-	result := make(map[string]map[string]string)
-
-	for i := 0; i < df.Nrow(); i++ {
-		levelName := df.Elem(i, 0).String() // First column is LevelName
-		rowData := make(map[string]string)
-
-		for j, colName := range df.Names() {
-			rowData[colName] = df.Elem(i, j).String()
-		}
-
-		result[levelName] = rowData
-	}
-
-	return result
 }
 
 func getFloatValue(df dataframe.DataFrame, row int, colName string) float64 {

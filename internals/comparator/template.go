@@ -1,6 +1,10 @@
 package comparator
 
-const htmlTemplate = `<!DOCTYPE html>
+// TODO: Consider using the embed library to load into the .exe / bin file
+// the html template so that we can have in the code base an html file
+// with the template instead of writing it here in go
+
+const reportTemplate = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
