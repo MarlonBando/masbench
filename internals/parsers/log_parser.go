@@ -63,7 +63,7 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 				currentLevel.MemoryAlloc = memoryMatch[1]
 			}
 			if maxMemoryMatch := maxMemoryPattern.FindStringSubmatch(line); maxMemoryMatch != nil {
-				currentLevel.MemoryAlloc = maxMemoryMatch[1]
+				currentLevel.MaxAlloc = maxMemoryMatch[1]
 			}
 		}
 	}
