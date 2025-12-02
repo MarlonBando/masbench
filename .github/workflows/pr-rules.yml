@@ -1,0 +1,22 @@
+name: Enforce Develop Merge
+on:
+  pull_request:
+    branches:
+    - main
+
+jobs:
+  check_source_branch:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check Source Branch Name
+      run: |
+        # GITHUB_HEAD_REF holds the name of the source branch (the one being merged)
+        SOURCE_BRANCH="${{ github.head_ref }}"
+
+        if [[ "$SOURCE_BRANCH" != "dev" ]]; then
+          echo "❌ Merge Blocked: Pull Requests into 'main' must originate from the 'develop' branch."
+          echo "::error::Only 'develop' is allowed to merge into 'main'."
+          exit 1 # Fails the GitHub Action status check
+        else
+          echo "✅ Source branch is 'develop'. Check Passed."
+        fi
