@@ -88,7 +88,7 @@ func runBenchmark(name string, message string) {
 
 	fmt.Println("\033[32mBenchmark run completed successfully.\033[0m")
 
-													// After the benchmark, parse the client log to CSV
+	// After the benchmark, parse the client log to CSV
 	csvOutputPath := filepath.Join(benchmarkPath, fmt.Sprintf("%s_results.csv", name))
 	err = parsers.ParseLogToCSV(logClientPath, csvOutputPath)
 	if err != nil {
