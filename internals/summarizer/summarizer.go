@@ -3,6 +3,7 @@ package summarizer
 import (
 	"fmt"
 	"html/template"
+	"masbench/internals/config"
 	"math"
 	"os"
 	"sort"
@@ -19,7 +20,7 @@ func GenerateHTMLSummary(benchmarkPaths map[string]string, outputPath string) er
 	}
 
 	funcMap := template.FuncMap{
-		"add": func(a, b interface{}) float64 {
+		"add": func(a, b any) float64 {
 			var aVal, bVal float64
 			switch v := a.(type) {
 			case int:
@@ -124,7 +125,7 @@ func calculateOverallStats(dataframes map[string]dataframe.DataFrame, benchmarkN
 		for _, level := range allLevels {
 			data, exists := dfMap[level]
 			if !exists {
-				totalTimes[name] += getDefaultTimeout()
+				totalTimes[name] += float64(getDefaultTimeout())
 				continue
 			}
 
@@ -138,12 +139,12 @@ func calculateOverallStats(dataframes map[string]dataframe.DataFrame, benchmarkN
 				solvedCounts[name]++
 				totalTimes[name] += timeVal
 				solvedTimes[name] = append(solvedTimes[name], timeVal)
-				
+
 				if errMem == nil && !math.IsNaN(memVal) && !math.IsInf(memVal, 0) {
 					totalMemory[name] += memVal
 				}
 			} else {
-				totalTimes[name] += getDefaultTimeout()
+				totalTimes[name] += float64(getDefaultTimeout())
 			}
 
 			totalStates[name] += genVal + expVal
@@ -392,8 +393,8 @@ func createDataframeMap(df dataframe.DataFrame) map[string]map[string]string {
 	return result
 }
 
-func getDefaultTimeout() float64 {
-	return 300.0
+func getDefaultTimeout() int {
+	return config.GetConfig().Timeout
 }
 
 func calculateIndividualStats(dataframes map[string]dataframe.DataFrame, benchmarkNames []string, allLevels []string, levelSummaries []LevelSummary) []IndividualBenchmarkStats {
@@ -429,7 +430,7 @@ func calculateIndividualStats(dataframes map[string]dataframe.DataFrame, benchma
 		for _, level := range allLevels {
 			data, exists := dfMap[level]
 			if !exists {
-				individual.TotalTime += getDefaultTimeout()
+				individual.TotalTime += float64(getDefaultTimeout())
 				continue
 			}
 
@@ -449,13 +450,13 @@ func calculateIndividualStats(dataframes map[string]dataframe.DataFrame, benchma
 				individual.TotalActions += actionsVal
 				solvedTimes = append(solvedTimes, timeVal)
 				solvedActions = append(solvedActions, actionsVal)
-				
+
 				if errMem == nil && !math.IsNaN(memVal) && !math.IsInf(memVal, 0) {
 					individual.TotalMemory += memVal
 					solvedMemory = append(solvedMemory, memVal)
 				}
 			} else {
-				individual.TotalTime += getDefaultTimeout()
+				individual.TotalTime += float64(getDefaultTimeout())
 			}
 		}
 
