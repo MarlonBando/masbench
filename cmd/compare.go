@@ -5,10 +5,10 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/go-gota/gota/dataframe"
 	"github.com/spf13/cobra"
 	"masbench/internals/comparator"
 	"masbench/internals/config"
+	"masbench/internals/utils"
 )
 
 func init() {
@@ -62,13 +62,13 @@ The generated HTML report can be opened directly in any web browser.`,
 }
 
 func compareResults(benchmark1Path, benchmark2Path, name1, name2 string) {
-	df1, err := readCSV(benchmark1Path)
+	df1, err := utils.LoadCSV(benchmark1Path)
 	if err != nil {
 		fmt.Printf(colorRed+"Error reading benchmark1 CSV: %v%s\n", err, colorReset)
 		os.Exit(1)
 	}
 
-	df2, err := readCSV(benchmark2Path)
+	df2, err := utils.LoadCSV(benchmark2Path)
 	if err != nil {
 		fmt.Printf(colorRed+"Error reading benchmark2 CSV: %v%s\n", err, colorReset)
 		os.Exit(1)
@@ -93,14 +93,4 @@ func compareResults(benchmark1Path, benchmark2Path, name1, name2 string) {
 	fmt.Printf(colorGreen+"Comparison completed successfully!%s\n", colorReset)
 	fmt.Printf(colorGreen+"HTML Report: %s%s\n", reportPath, colorReset)
 	fmt.Printf(colorYellow+"Open the HTML file in your browser to view the interactive report.%s\n", colorReset)
-}
-
-func readCSV(filePath string) (dataframe.DataFrame, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return dataframe.DataFrame{}, err
-	}
-	defer file.Close()
-
-	return dataframe.ReadCSV(file), nil
 }

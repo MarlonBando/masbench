@@ -4,13 +4,20 @@ import (
 	"fmt"
 	"html/template"
 	"masbench/internals/config"
+	"masbench/internals/models"
+	"masbench/internals/utils"
 	"math"
 	"os"
 	"sort"
-	"strconv"
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
+)
+
+const (
+	// TIME_TOLERANCE defines the tolerance for considering times as equal (in seconds)
+	// TODO: Make this configurable via parameter
+	TIME_TOLERANCE = 0.1
 )
 
 func GenerateHTMLSummary(benchmarkPaths map[string]string, outputPath string) error {
@@ -61,12 +68,10 @@ func prepareSummaryData(benchmarkPaths map[string]string) (SummaryReport, error)
 	benchmarkNames := make([]string, 0, len(benchmarkPaths))
 
 	for name, path := range benchmarkPaths {
-		file, err := os.Open(path)
+		df, err := utils.LoadCSV(path)
 		if err != nil {
 			return SummaryReport{}, err
 		}
-		df := dataframe.ReadCSV(file)
-		file.Close()
 		dataframes[name] = df
 		benchmarkNames = append(benchmarkNames, name)
 	}
@@ -92,7 +97,7 @@ func prepareSummaryData(benchmarkPaths map[string]string) (SummaryReport, error)
 func collectAllLevels(dataframes map[string]dataframe.DataFrame) []string {
 	levelSet := make(map[string]bool)
 	for _, df := range dataframes {
-		levels := df.Col("LevelName").Records()
+		levels := df.Col(models.ColLevelName).Records()
 		for _, level := range levels {
 			levelSet[level] = true
 		}
@@ -107,8 +112,10 @@ func collectAllLevels(dataframes map[string]dataframe.DataFrame) []string {
 }
 
 func calculateOverallStats(dataframes map[string]dataframe.DataFrame, benchmarkNames []string, allLevels []string) OverallStats {
+	timeout := getDefaultTimeout()
 	stats := OverallStats{
 		TotalLevels: len(allLevels),
+		Timeout:     timeout,
 	}
 
 	solvedCounts := make(map[string]int)
@@ -120,34 +127,39 @@ func calculateOverallStats(dataframes map[string]dataframe.DataFrame, benchmarkN
 
 	for _, name := range benchmarkNames {
 		df := dataframes[name]
-		dfMap := createDataframeMap(df)
+		dfMap := utils.ToMap(df)
 
 		for _, level := range allLevels {
 			data, exists := dfMap[level]
 			if !exists {
-				totalTimes[name] += float64(getDefaultTimeout())
+				totalTimes[name] += float64(timeout)
 				continue
 			}
 
-			solved := data["Solved"]
-			timeVal, _ := strconv.ParseFloat(data["Time"], 64)
-			memVal, errMem := strconv.ParseFloat(data["MemoryAlloc"], 64)
-			genVal, _ := strconv.ParseFloat(data["Generated"], 64)
-			expVal, _ := strconv.ParseFloat(data["Explored"], 64)
+			solved := data[models.ColSolved]
+			timeVal := utils.GetFloatFromMap(data, models.ColTime)
+			memVal := utils.GetFloatFromMap(data, models.ColMemoryAlloc)
+			genVal := utils.GetFloatFromMap(data, models.ColGenerated)
+			expVal := utils.GetFloatFromMap(data, models.ColExplored)
 
-			if solved == "Yes" {
+			if solved == models.SolvedYes {
 				solvedCounts[name]++
 				totalTimes[name] += timeVal
 				solvedTimes[name] = append(solvedTimes[name], timeVal)
 
-				if errMem == nil && !math.IsNaN(memVal) && !math.IsInf(memVal, 0) {
+				if !math.IsNaN(memVal) && !math.IsInf(memVal, 0) {
 					totalMemory[name] += memVal
 				}
 			} else {
-				totalTimes[name] += float64(getDefaultTimeout())
+				totalTimes[name] += float64(timeout)
 			}
 
-			totalStates[name] += genVal + expVal
+			if !math.IsNaN(genVal) && !math.IsInf(genVal, 0) {
+				totalStates[name] += genVal
+			}
+			if !math.IsNaN(expVal) && !math.IsInf(expVal, 0) {
+				totalStates[name] += expVal
+			}
 		}
 
 		if len(solvedTimes[name]) > 0 {
@@ -255,67 +267,88 @@ func calculateLevelSummary(dataframes map[string]dataframe.DataFrame, allLevels 
 			LevelName: level,
 		}
 
-		var fastestTime, fewestActions *BenchmarkValue
+		var timeWinners []string
+		var actionWinners []string
 		minTime := math.MaxFloat64
 		minActions := math.MaxFloat64
 
 		for name, df := range dataframes {
-			dfMap := createDataframeMap(df)
+			dfMap := utils.ToMap(df)
 			data, exists := dfMap[level]
 			if !exists {
 				summary.NotSolvedBy = append(summary.NotSolvedBy, name)
 				continue
 			}
 
-			solved := data["Solved"]
-			if solved != "Yes" {
+			solved := data[models.ColSolved]
+			if solved != models.SolvedYes {
 				summary.NotSolvedBy = append(summary.NotSolvedBy, name)
 				continue
 			}
 
 			summary.SolvedBy = append(summary.SolvedBy, name)
 
-			timeVal, _ := strconv.ParseFloat(data["Time"], 64)
-			if timeVal < minTime {
+			// Track time winners (with tolerance)
+			timeVal := utils.GetFloatFromMap(data, models.ColTime)
+			if timeVal < minTime-TIME_TOLERANCE {
+				// New clear winner
 				minTime = timeVal
-				fastestTime = &BenchmarkValue{
-					BenchmarkName: name,
-					Value:         timeVal,
-					DisplayValue:  fmt.Sprintf("%.3fs", timeVal),
-					IsSolved:      true,
+				timeWinners = []string{name}
+			} else if math.Abs(timeVal-minTime) <= TIME_TOLERANCE {
+				// Tie - add to winners list
+				if !contains(timeWinners, name) {
+					timeWinners = append(timeWinners, name)
 				}
 			}
 
-			actionsVal, _ := strconv.ParseFloat(data["Actions"], 64)
+			// Track action winners (exact comparison)
+			actionsVal := utils.GetFloatFromMap(data, models.ColActions)
 			if actionsVal < minActions {
+				// New clear winner
 				minActions = actionsVal
-				fewestActions = &BenchmarkValue{
-					BenchmarkName: name,
-					Value:         actionsVal,
-					DisplayValue:  fmt.Sprintf("%.0f", actionsVal),
-					IsSolved:      true,
+				actionWinners = []string{name}
+			} else if actionsVal == minActions {
+				// Exact tie - add to winners list
+				if !contains(actionWinners, name) {
+					actionWinners = append(actionWinners, name)
 				}
 			}
 		}
 
-		if fastestTime != nil {
-			summary.FastestTime = *fastestTime
+		// Store time results
+		if len(timeWinners) > 0 {
+			summary.FastestTime = BenchmarkValue{
+				BenchmarkName: timeWinners[0], // Keep first for backward compatibility
+				Value:         minTime,
+				DisplayValue:  fmt.Sprintf("%.3fs", minTime),
+				IsSolved:      true,
+			}
+			summary.FastestTimeWinners = timeWinners
 		} else {
 			summary.FastestTime = BenchmarkValue{
 				BenchmarkName: "None",
 				DisplayValue:  "Not solved",
 				IsSolved:      false,
 			}
+			summary.FastestTimeWinners = []string{}
 		}
 
-		if fewestActions != nil {
-			summary.FewestActions = *fewestActions
+		// Store action results
+		if len(actionWinners) > 0 {
+			summary.FewestActions = BenchmarkValue{
+				BenchmarkName: actionWinners[0], // Keep first for backward compatibility
+				Value:         minActions,
+				DisplayValue:  fmt.Sprintf("%.0f", minActions),
+				IsSolved:      true,
+			}
+			summary.FewestActionsWinners = actionWinners
 		} else {
 			summary.FewestActions = BenchmarkValue{
 				BenchmarkName: "None",
 				DisplayValue:  "Not solved",
 				IsSolved:      false,
 			}
+			summary.FewestActionsWinners = []string{}
 		}
 
 		sort.Strings(summary.SolvedBy)
@@ -332,11 +365,12 @@ func determineBestByMetric(summaries []LevelSummary, benchmarkNames []string) Be
 	actionWins := make(map[string]int)
 
 	for _, summary := range summaries {
-		if summary.FastestTime.IsSolved {
-			timeWins[summary.FastestTime.BenchmarkName]++
+		// Credit ALL tied winners
+		for _, winner := range summary.FastestTimeWinners {
+			timeWins[winner]++
 		}
-		if summary.FewestActions.IsSolved {
-			actionWins[summary.FewestActions.BenchmarkName]++
+		for _, winner := range summary.FewestActionsWinners {
+			actionWins[winner]++
 		}
 	}
 
@@ -380,19 +414,6 @@ func findMaxWinner(wins map[string]int, benchmarkNames []string) string {
 	return fmt.Sprintf("%s (tie: %d levels each)", result, maxWins)
 }
 
-func createDataframeMap(df dataframe.DataFrame) map[string]map[string]string {
-	result := make(map[string]map[string]string)
-	for i := 0; i < df.Nrow(); i++ {
-		levelName := df.Elem(i, 0).String()
-		rowData := make(map[string]string)
-		for j, colName := range df.Names() {
-			rowData[colName] = df.Elem(i, j).String()
-		}
-		result[levelName] = rowData
-	}
-	return result
-}
-
 func getDefaultTimeout() int {
 	return config.GetConfig().Timeout
 }
@@ -403,17 +424,18 @@ func calculateIndividualStats(dataframes map[string]dataframe.DataFrame, benchma
 	timeWins := make(map[string]int)
 	actionWins := make(map[string]int)
 	for _, summary := range levelSummaries {
-		if summary.FastestTime.IsSolved {
-			timeWins[summary.FastestTime.BenchmarkName]++
+		// Credit ALL tied winners
+		for _, winner := range summary.FastestTimeWinners {
+			timeWins[winner]++
 		}
-		if summary.FewestActions.IsSolved {
-			actionWins[summary.FewestActions.BenchmarkName]++
+		for _, winner := range summary.FewestActionsWinners {
+			actionWins[winner]++
 		}
 	}
 
 	for _, name := range benchmarkNames {
 		df := dataframes[name]
-		dfMap := createDataframeMap(df)
+		dfMap := utils.ToMap(df)
 
 		individual := IndividualBenchmarkStats{
 			Name:        name,
@@ -434,24 +456,28 @@ func calculateIndividualStats(dataframes map[string]dataframe.DataFrame, benchma
 				continue
 			}
 
-			timeVal, _ := strconv.ParseFloat(data["Time"], 64)
-			actionsVal, _ := strconv.ParseFloat(data["Actions"], 64)
-			memVal, errMem := strconv.ParseFloat(data["MemoryAlloc"], 64)
-			genVal, _ := strconv.ParseFloat(data["Generated"], 64)
-			expVal, _ := strconv.ParseFloat(data["Explored"], 64)
+			timeVal := utils.GetFloatFromMap(data, models.ColTime)
+			actionsVal := utils.GetFloatFromMap(data, models.ColActions)
+			memVal := utils.GetFloatFromMap(data, models.ColMemoryAlloc)
+			genVal := utils.GetFloatFromMap(data, models.ColGenerated)
+			expVal := utils.GetFloatFromMap(data, models.ColExplored)
 
-			individual.TotalGenerated += genVal
-			individual.TotalExplored += expVal
+			if !math.IsNaN(genVal) && !math.IsInf(genVal, 0) {
+				individual.TotalGenerated += genVal
+			}
+			if !math.IsNaN(expVal) && !math.IsInf(expVal, 0) {
+				individual.TotalExplored += expVal
+			}
 
-			solved := data["Solved"]
-			if solved == "Yes" {
+			solved := data[models.ColSolved]
+			if solved == models.SolvedYes {
 				solvedCount++
 				individual.TotalTime += timeVal
 				individual.TotalActions += actionsVal
 				solvedTimes = append(solvedTimes, timeVal)
 				solvedActions = append(solvedActions, actionsVal)
 
-				if errMem == nil && !math.IsNaN(memVal) && !math.IsInf(memVal, 0) {
+				if !math.IsNaN(memVal) && !math.IsInf(memVal, 0) {
 					individual.TotalMemory += memVal
 					solvedMemory = append(solvedMemory, memVal)
 				}
@@ -491,4 +517,14 @@ func calculateIndividualStats(dataframes map[string]dataframe.DataFrame, benchma
 	}
 
 	return stats
+}
+
+// contains checks if a string slice contains a specific string
+func contains(slice []string, item string) bool {
+	for _, s := range slice {
+		if s == item {
+			return true
+		}
+	}
+	return false
 }

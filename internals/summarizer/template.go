@@ -184,23 +184,6 @@ const summaryTemplate = `<!DOCTYPE html>
             </div>
             {{end}}
 
-            <!-- Most Efficient States -->
-            {{if .OverallStats.MostEfficient}}
-            <div class="bg-white rounded-lg shadow border border-gray-200 p-6 metric-card winner">
-                <div class="flex items-center justify-between mb-3">
-                    <p class="text-sm font-medium text-gray-900">🎖️ State Efficient</p>
-                    <div class="text-4xl">⚙️</div>
-                </div>
-                {{range .OverallStats.MostEfficient}}
-                <div class="mb-2">
-                    <p class="text-xl font-bold text-gray-900">{{.Name}}</p>
-                    <p class="text-sm text-gray-600">{{.Value}}</p>
-                    <p class="text-xs text-gray-500">{{.Extra}}</p>
-                </div>
-                {{end}}
-            </div>
-            {{end}}
-
             <!-- Best by Time -->
             <div class="bg-blue-50 rounded-lg shadow border border-blue-200 p-6 metric-card">
                 <div class="flex items-center justify-between mb-3">
@@ -402,19 +385,27 @@ const summaryTemplate = `<!DOCTYPE html>
                                 {{.LevelName}}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{if .FastestTime.IsSolved}}
+                                {{if gt (len .FastestTimeWinners) 0}}
                                     <div class="font-semibold text-blue-600">{{.FastestTime.DisplayValue}}</div>
-                                    <div class="text-xs text-gray-500">{{.FastestTime.BenchmarkName}}</div>
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        {{range .FastestTimeWinners}}
+                                            <span class="badge badge-success">{{.}}</span>
+                                        {{end}}
+                                    </div>
                                 {{else}}
-                                    <span class="text-red-600">{{.FastestTime.DisplayValue}}</span>
+                                    <span class="text-red-600">Not solved</span>
                                 {{end}}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                                {{if .FewestActions.IsSolved}}
+                                {{if gt (len .FewestActionsWinners) 0}}
                                     <div class="font-semibold text-green-600">{{.FewestActions.DisplayValue}}</div>
-                                    <div class="text-xs text-gray-500">{{.FewestActions.BenchmarkName}}</div>
+                                    <div class="flex flex-wrap gap-1 mt-1">
+                                        {{range .FewestActionsWinners}}
+                                            <span class="badge badge-success">{{.}}</span>
+                                        {{end}}
+                                    </div>
                                 {{else}}
-                                    <span class="text-red-600">{{.FewestActions.DisplayValue}}</span>
+                                    <span class="text-red-600">Not solved</span>
                                 {{end}}
                             </td>
                             <td class="px-6 py-4 text-sm text-gray-900">

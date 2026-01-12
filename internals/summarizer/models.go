@@ -1,17 +1,18 @@
 package summarizer
 
 type SummaryReport struct {
-	Title            string
-	GeneratedAt      string
-	Benchmarks       []string
-	OverallStats     OverallStats
-	LevelSummary     []LevelSummary
-	BestByMetric     BestByMetric
-	IndividualStats  []IndividualBenchmarkStats
+	Title           string
+	GeneratedAt     string
+	Benchmarks      []string
+	OverallStats    OverallStats
+	LevelSummary    []LevelSummary
+	BestByMetric    BestByMetric
+	IndividualStats []IndividualBenchmarkStats
 }
 
 type OverallStats struct {
 	TotalLevels       int
+	Timeout           int
 	MostLevelsSolved  []BenchmarkStat
 	FastestCompletion []BenchmarkStat
 	BestAvgTime       []BenchmarkStat
@@ -26,11 +27,13 @@ type BenchmarkStat struct {
 }
 
 type LevelSummary struct {
-	LevelName      string
-	FastestTime    BenchmarkValue
-	FewestActions  BenchmarkValue
-	SolvedBy       []string
-	NotSolvedBy    []string
+	LevelName            string
+	FastestTime          BenchmarkValue
+	FastestTimeWinners   []string
+	FewestActions        BenchmarkValue
+	FewestActionsWinners []string
+	SolvedBy             []string
+	NotSolvedBy          []string
 }
 
 type BenchmarkValue struct {
@@ -46,18 +49,18 @@ type BestByMetric struct {
 }
 
 type IndividualBenchmarkStats struct {
-	Name              string
-	LevelsSolved      int
-	LevelsTotal       int
-	SolvePercentage   float64
-	TotalTime         float64
-	AvgTime           float64
-	TotalActions      float64
-	AvgActions        float64
-	TotalMemory       float64
-	AvgMemory         float64
-	TotalGenerated    float64
-	TotalExplored     float64
-	TimeWins          int
-	ActionWins        int
+	Name            string
+	LevelsSolved    int
+	LevelsTotal     int
+	SolvePercentage float64
+	TotalTime       float64
+	AvgTime         float64
+	TotalActions    float64
+	AvgActions      float64
+	TotalMemory     float64
+	AvgMemory       float64
+	TotalGenerated  float64
+	TotalExplored   float64
+	TimeWins        int
+	ActionWins      int
 }

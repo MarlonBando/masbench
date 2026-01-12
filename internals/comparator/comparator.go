@@ -3,8 +3,9 @@ package comparator
 import (
 	"fmt"
 	"html/template"
+	"masbench/internals/models"
+	"masbench/internals/utils"
 	"os"
-	"strconv"
 	"time"
 
 	"github.com/go-gota/gota/dataframe"
@@ -37,22 +38,12 @@ func prepareComparisonData(df1, df2 dataframe.DataFrame, name1, name2 string) Co
 		Benchmark1Name: name1,
 		Benchmark2Name: name2,
 		GeneratedAt:    time.Now().Format("2006-01-02 15:04:05"),
-		MetricNames:    []string{"Generated", "Explored", "MemoryAlloc", "Time", "Actions"},
+		MetricNames:    []string{models.ColGenerated, models.ColExplored, models.ColMemoryAlloc, models.ColTime, models.ColActions},
 	}
 
-	df2Map := make(map[string]map[string]string)
-	for i := 0; i < df2.Nrow(); i++ {
-		levelName := df2.Elem(i, 0).String()
-		rowData := make(map[string]string)
+	df2Map := utils.ToMap(df2)
 
-		for j, colName := range df2.Names() {
-			rowData[colName] = df2.Elem(i, j).String()
-		}
-
-		df2Map[levelName] = rowData
-	}
-
-	levelNames1 := df1.Col("LevelName").Records()
+	levelNames1 := df1.Col(models.ColLevelName).Records()
 
 	for i := 0; i < df1.Nrow(); i++ {
 		levelName := levelNames1[i]
@@ -60,43 +51,43 @@ func prepareComparisonData(df1, df2 dataframe.DataFrame, name1, name2 string) Co
 			LevelName: levelName,
 		}
 
-		df2Data, exists := df2Map[levelName]
+		df2Data := df2Map[levelName]
 
 		levelComp.Generated = compareMetric(
-			getFloatValue(df1, i, "Generated"),
-			getFloatValueFromMap(df2Data, "Generated", exists),
+			utils.GetFloatFromDF(df1, i, models.ColGenerated),
+			utils.GetFloatFromMap(df2Data, models.ColGenerated),
 			true,
 		)
 
 		levelComp.Explored = compareMetric(
-			getFloatValue(df1, i, "Explored"),
-			getFloatValueFromMap(df2Data, "Explored", exists),
+			utils.GetFloatFromDF(df1, i, models.ColExplored),
+			utils.GetFloatFromMap(df2Data, models.ColExplored),
 			true,
 		)
 
 		levelComp.MemoryAlloc = compareMetric(
-			getFloatValue(df1, i, "MemoryAlloc"),
-			getFloatValueFromMap(df2Data, "MemoryAlloc", exists),
+			utils.GetFloatFromDF(df1, i, models.ColMemoryAlloc),
+			utils.GetFloatFromMap(df2Data, models.ColMemoryAlloc),
 			true,
 		)
 
 		levelComp.Time = compareMetric(
-			getFloatValue(df1, i, "Time"),
-			getFloatValueFromMap(df2Data, "Time", exists),
+			utils.GetFloatFromDF(df1, i, models.ColTime),
+			utils.GetFloatFromMap(df2Data, models.ColTime),
 			true,
 		)
 
 		levelComp.Actions = compareMetric(
-			getFloatValue(df1, i, "Actions"),
-			getFloatValueFromMap(df2Data, "Actions", exists),
+			utils.GetFloatFromDF(df1, i, models.ColActions),
+			utils.GetFloatFromMap(df2Data, models.ColActions),
 			true,
 		)
 
-		solved1 := getStringValue(df1, i, "Solved")
-		solved2 := getStringValueFromMap(df2Data, "Solved", exists)
+		solved1 := utils.GetStringFromDF(df1, i, models.ColSolved)
+		solved2 := utils.GetStringFromMap(df2Data, models.ColSolved)
 		levelComp.Solved = compareSolved(solved1, solved2)
 
-		if solved1 == "Yes" && solved2 == "No" {
+		if solved1 == models.SolvedYes && solved2 == models.SolvedNo {
 			levelComp.Generated.Status = "improvement"
 			levelComp.Generated.IsImprovement = true
 			levelComp.Explored.Status = "improvement"
@@ -107,7 +98,7 @@ func prepareComparisonData(df1, df2 dataframe.DataFrame, name1, name2 string) Co
 			levelComp.Time.IsImprovement = true
 			levelComp.Actions.Status = "improvement"
 			levelComp.Actions.IsImprovement = true
-		} else if solved1 == "No" && solved2 == "Yes" {
+		} else if solved1 == models.SolvedNo && solved2 == models.SolvedYes {
 			levelComp.Generated.Status = "regression"
 			levelComp.Generated.IsImprovement = false
 			levelComp.Explored.Status = "regression"
@@ -165,7 +156,7 @@ func compareSolved(solved1, solved2 string) SolvedComparison {
 
 	if !changed {
 		status = "unchanged"
-	} else if solved1 == "Yes" && solved2 == "No" {
+	} else if solved1 == models.SolvedYes && solved2 == models.SolvedNo {
 		status = "improvement"
 	} else {
 		status = "regression"
@@ -177,68 +168,4 @@ func compareSolved(solved1, solved2 string) SolvedComparison {
 		Changed: changed,
 		Status:  status,
 	}
-}
-
-func getFloatValue(df dataframe.DataFrame, row int, colName string) float64 {
-	colIndex := getColumnIndex(df, colName)
-	if colIndex == -1 {
-		return 0.0
-	}
-
-	valStr := df.Elem(row, colIndex).String()
-	val, err := strconv.ParseFloat(valStr, 64)
-	if err != nil {
-		return 0.0
-	}
-
-	return val
-}
-
-func getFloatValueFromMap(data map[string]string, colName string, exists bool) float64 {
-	if !exists {
-		return 0.0
-	}
-
-	valStr, ok := data[colName]
-	if !ok {
-		return 0.0
-	}
-
-	val, err := strconv.ParseFloat(valStr, 64)
-	if err != nil {
-		return 0.0
-	}
-
-	return val
-}
-
-func getStringValue(df dataframe.DataFrame, row int, colName string) string {
-	colIndex := getColumnIndex(df, colName)
-	if colIndex == -1 {
-		return ""
-	}
-
-	return df.Elem(row, colIndex).String()
-}
-
-func getStringValueFromMap(data map[string]string, colName string, exists bool) string {
-	if !exists {
-		return ""
-	}
-
-	val, ok := data[colName]
-	if !ok {
-		return ""
-	}
-
-	return val
-}
-
-func getColumnIndex(df dataframe.DataFrame, colName string) int {
-	for i, name := range df.Names() {
-		if name == colName {
-			return i
-		}
-	}
-	return -1
 }
