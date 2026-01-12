@@ -21,7 +21,7 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 
 	levelPattern := regexp.MustCompile(`\[server\]\[info\] Running client on level file: ([^\s]+)`)
 	solvedPattern := regexp.MustCompile(`\[server\]\[info\] Level solved: (Yes|No)`)
-	actionsPattern := regexp.MustCompile(`\[server\]\[info\] Actions used: (\d+)`)
+	actionsPattern := regexp.MustCompile(`\[server\]\[info\] Actions used: (\d{1,3}(?:,\d{3})*)`)
 	timePattern := regexp.MustCompile(`\[server\]\[info\] Time to solve: ([0-9.]+) seconds`)
 	exploredPattern := regexp.MustCompile(`\[client\]\[message\]\s*Explored:\s*(\d+)`)
 	generatedPattern := regexp.MustCompile(`\[client\]\[message\]\s*Generated:\s*(\d+)`)
@@ -48,7 +48,7 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 				currentLevel.Solved = solvedMatch[1]
 			}
 			if actionsMatch := actionsPattern.FindStringSubmatch(line); actionsMatch != nil {
-				currentLevel.Actions = actionsMatch[1]
+				currentLevel.Actions = strings.ReplaceAll(actionsMatch[1], ",", "")
 			}
 			if timeMatch := timePattern.FindStringSubmatch(line); timeMatch != nil {
 				currentLevel.Time = timeMatch[1]
