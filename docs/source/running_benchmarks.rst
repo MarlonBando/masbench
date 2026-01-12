@@ -141,19 +141,18 @@ If you see this error:
 
    Error: Benchmark with name 'my-benchmark' already exists. Please remove it before running a new one.
 
-You have several options:
+You have two options:
 
 1. **Choose a different name**: Use a new benchmark name
-2. **Remove the existing benchmark**: Delete the folder manually
-3. **Rename the existing benchmark**: Move it to preserve the results
+2. **Remove the existing benchmark**: Use the ``rm`` command
 
 .. code-block:: bash
 
    # Remove existing benchmark
-   rm -rf benchmark-results/my-benchmark
+   masbench rm my-benchmark
    
-   # Or rename it to preserve results
-   mv benchmark-results/my-benchmark benchmark-results/my-benchmark-old
+   # Then run your new benchmark
+   masbench run my-benchmark
 
 Server Not Found
 ~~~~~~~~~~~~~~~~
@@ -194,6 +193,50 @@ Once you have benchmark results:
 2. Compare different algorithm implementations
 3. Use the comparison tools to visualize differences
 
+Managing Your Benchmarks
+-------------------------
+
+Listing Benchmarks
+~~~~~~~~~~~~~~~~~~
+
+To see all benchmarks in your benchmark folder:
+
+.. code-block:: bash
+
+   masbench list
+
+This shows all benchmark names in your configured benchmark folder. The output excludes the ``comparisons`` folder.
+
+Removing Benchmarks
+~~~~~~~~~~~~~~~~~~~
+
+To delete a benchmark and all related comparisons:
+
+.. code-block:: bash
+
+   masbench rm benchmark-name
+
+This command removes:
+
+- The benchmark folder and all its contents (logs, results)
+- Any comparison folders that include this benchmark
+
+.. warning::
+   This action cannot be undone. The benchmark data will be deleted.
+
+For example:
+
+.. code-block:: bash
+
+   # Remove a benchmark
+   masbench rm old-experiment
+   
+   # This deletes:
+   # - benchmarks/old-experiment/
+   # - benchmarks/comparisons/old-experimentvs*/
+   # - benchmarks/comparisons/*vsold-experiment/
+
 .. seealso::
    - For comparing benchmark results, see the :doc:`comparison` guide
+   - For summary reports, see the :doc:`summary` guide
    - For initial setup, see the :doc:`getting_started` guide

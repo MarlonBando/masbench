@@ -13,7 +13,6 @@ The masbench comparison feature allows you to:
 - Visualize performance differences with color-coded metrics
 - Sort and filter comparison data
 - Export individual charts as PNG images
-- Toggle between light and dark modes
 
 Basic Comparison
 ----------------
@@ -132,11 +131,6 @@ Charts are organized in tabs for each metric:
 - Side-by-side bar comparison
 - Responsive sizing
 
-Dark Mode
-~~~~~~~~~
-
-Toggle between light and dark modes using the button in the top-right corner. Your preference persists during your session.
-
 Interpreting Results
 --------------------
 
@@ -167,15 +161,6 @@ This means:
 - benchmark1 is 20 units lower (better)
 - This is a 16.7% improvement
 
-Color Interpretation
-~~~~~~~~~~~~~~~~~~~~
-
-In the comparison table, cells are color-coded:
-
-- **Green background**: benchmark1 is better for this metric
-- **Red background**: benchmark1 is worse for this metric
-- **Gray background**: No difference between benchmarks
-
 Example Workflow
 ----------------
 
@@ -194,28 +179,11 @@ Example Workflow
 
 3. Open the generated HTML report in your browser
 
-4. Analyze the results:
-   - Check the info banner to understand the comparison direction
-   - Use filters to focus on regressions
-   - Sort by time to find slowest levels
-   - Export charts for presentations or reports
-
-5. If you want to see the opposite perspective:
+4. If you want to see the opposite perspective:
 
    .. code-block:: bash
 
       masbench compare astar-baseline astar-optimized
-
-Next Steps
-----------
-
-After analyzing your comparisons:
-
-1. Identify which implementation performs better overall
-2. Look for specific levels where one algorithm excels
-3. Investigate why certain levels show significant differences
-4. Plan optimizations based on the insights gained
-5. Document your findings using the exported charts
 
 .. seealso::
    - For running benchmarks, see the :doc:`running_benchmarks` guide

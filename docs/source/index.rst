@@ -26,4 +26,5 @@ to save some of it.
    getting_started
    running_benchmarks
    comparison
+   summary
    changes
