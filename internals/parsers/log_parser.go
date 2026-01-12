@@ -19,14 +19,14 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 	}
 	defer file.Close()
 
-	// Define regex patterns
 	levelPattern := regexp.MustCompile(`\[server\]\[info\] Running client on level file: ([^\s]+)`)
 	solvedPattern := regexp.MustCompile(`\[server\]\[info\] Level solved: (Yes|No)`)
-	actionsPattern := regexp.MustCompile(`\[server\]\[info\] Actions used: (\d+)`)
+	actionsPattern := regexp.MustCompile(`\[server\]\[info\] Actions used: (\d{1,3}(?:,\d{3})*)`)
 	timePattern := regexp.MustCompile(`\[server\]\[info\] Time to solve: ([0-9.]+) seconds`)
-	exploredPattern := regexp.MustCompile(`\[client\]\[message\] Explored: (\d+)`)
-	generatedPattern := regexp.MustCompile(`\[client\]\[message\] Generated: (\d+)`)
-	memoryPattern := regexp.MustCompile(`\[client\]\[message\] Alloc: ([0-9.]+) MB, MaxAlloc: ([0-9.]+) MB`)
+	exploredPattern := regexp.MustCompile(`\[client\]\[message\]\s*Explored:\s*(\d+)`)
+	generatedPattern := regexp.MustCompile(`\[client\]\[message\]\s*Generated:\s*(\d+)`)
+	memoryPattern := regexp.MustCompile(`\[client\]\[message\]\s*Alloc:\s*([0-9.]+)\s*MB`)
+	maxMemoryPattern := regexp.MustCompile(`\[client\]\[message\]\s*MaxAlloc:\s*([0-9.]+)\s*MB`)
 
 	var logs []models.LevelMetrics
 	var currentLevel *models.LevelMetrics
@@ -48,7 +48,7 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 				currentLevel.Solved = solvedMatch[1]
 			}
 			if actionsMatch := actionsPattern.FindStringSubmatch(line); actionsMatch != nil {
-				currentLevel.Actions = actionsMatch[1]
+				currentLevel.Actions = strings.ReplaceAll(actionsMatch[1], ",", "")
 			}
 			if timeMatch := timePattern.FindStringSubmatch(line); timeMatch != nil {
 				currentLevel.Time = timeMatch[1]
@@ -61,7 +61,9 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 			}
 			if memoryMatch := memoryPattern.FindStringSubmatch(line); memoryMatch != nil {
 				currentLevel.MemoryAlloc = memoryMatch[1]
-				currentLevel.MaxAlloc = memoryMatch[2]
+			}
+			if maxMemoryMatch := maxMemoryPattern.FindStringSubmatch(line); maxMemoryMatch != nil {
+				currentLevel.MaxAlloc = maxMemoryMatch[1]
 			}
 		}
 	}

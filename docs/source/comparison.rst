@@ -1,7 +1,7 @@
 Comparison
 ==========
 
-This guide explains how to compare benchmark results using masbench's comparison tools to analyze the performance differences between different algorithm implementations or configurations.
+This guide explains how to compare benchmark results using masbench's interactive HTML comparison reports to analyze the performance differences between different algorithm implementations or configurations.
 
 Overview
 --------
@@ -9,9 +9,10 @@ Overview
 The masbench comparison feature allows you to:
 
 - Compare two benchmark results side by side
-- Generate visual charts for different performance metrics
-- Create detailed difference reports
-- Identify performance patterns and improvements
+- Generate interactive HTML reports with charts and tables
+- Visualize performance differences with color-coded metrics
+- Sort and filter comparison data
+- Export individual charts as PNG images
 
 Basic Comparison
 ----------------
@@ -31,6 +32,21 @@ For example, to compare an A* implementation against a BFS implementation:
 .. important::
    Both benchmark results must exist in your benchmark folder. If either benchmark is not found, masbench will display an error message.
 
+Understanding the Comparison
+----------------------------
+
+The comparison is **benchmark1-centric**, meaning all metrics show how ``benchmark1`` performed relative to ``benchmark2``:
+
+- **Green** indicates ``benchmark1`` performed better
+- **Red** indicates ``benchmark1`` performed worse  
+- **Gray** indicates no difference
+
+To reverse the comparison perspective, simply swap the benchmark order:
+
+.. code-block:: bash
+
+   masbench compare benchmark2-name benchmark1-name
+
 Prerequisites
 -------------
 
@@ -43,55 +59,131 @@ Before running comparisons, ensure you have:
 Generated Output
 ----------------
 
-When you run a comparison, masbench creates a new folder structure:
+When you run a comparison, masbench creates a new folder with an interactive HTML report:
 
 .. code-block:: text
 
    benchmark-results/
    └── comparisons/
        └── benchmark1vsbenchmark2/
-           ├── Generated.png
-           ├── Explored.png
-           ├── MemoryAlloc.png
-           ├── Time.png
-           ├── Actions.png
-           └── benchmark1vsbenchmark2_table.png
+           └── benchmark1vsbenchmark2_report.html
 
-Output Files Explained
-~~~~~~~~~~~~~~~~~~~~~~
+Opening the Report
+~~~~~~~~~~~~~~~~~~
 
-**Metric Charts** (``*.png``)
-   Individual bar charts comparing each performance metric:
+Simply open the HTML file in your web browser:
 
-   - ``Generated.png``: Nodes generated during search
-   - ``Explored.png``: Nodes explored during search  
-   - ``MemoryAlloc.png``: Memory allocated during execution
-   - ``Time.png``: Execution time for each level
-   - ``Actions.png``: Number of actions in the solution
+.. code-block:: bash
 
-**Difference Report** (``*_table.png``)
-   A comprehensive table showing side-by-side comparison of all metrics for each level, including difference calculations.
+   # Linux
+   xdg-open benchmark-results/comparisons/benchmark1vsbenchmark2/benchmark1vsbenchmark2_report.html
+   
+   # macOS
+   open benchmark-results/comparisons/benchmark1vsbenchmark2/benchmark1vsbenchmark2_report.html
+   
+   # Windows
+   start benchmark-results/comparisons/benchmark1vsbenchmark2/benchmark1vsbenchmark2_report.html
 
-Difference Report Table
-~~~~~~~~~~~~~~~~~~~~~~~
+Report Features
+---------------
 
-The difference report provides a detailed breakdown showing how the benchmark1 compared to benchmark2.
-If a metric is colored in green, it indicates benchmark1 outperformed benchmark2 for that metric on that level.
+Interactive Comparison Table
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. image:: _static/tablediff.png
-   :alt: Example of benchmark comparison table
-   :align: center
-   :width: 100%
+The main comparison table shows all metrics for each level:
 
-Next Steps
-----------
+- **Level Name**: The benchmark level identifier
+- **Generated**: Number of states generated (lower is better)
+- **Explored**: Number of states explored (lower is better)
+- **Memory**: Memory allocated in MB (lower is better)
+- **Time**: Execution time in seconds (lower is better)
+- **Actions**: Number of actions in solution (lower is better)
+- **Solved**: Whether the level was solved
 
-After analyzing your comparisons:
+Each metric displays:
+- Current values: ``value1 vs value2``
+- Difference: Shows how much better/worse benchmark1 is
+- Color coding: Green (better), Red (worse), Gray (same)
 
-1. Identify the best-performing algorithm for your use case
-2. Look for opportunities to combine strengths from different approaches
-3. Plan further optimizations based on the insights gained
-4. Document your findings for future reference
+**Table Features:**
+
+- **Search**: Filter levels by name using the search box
+- **Filter**: Show only improvements or regressions
+- **Sort**: Click column headers to sort by any metric
+- **Responsive**: Automatically adapts to your screen size
+
+Interactive Charts
+~~~~~~~~~~~~~~~~~~
+
+Charts are organized in tabs for each metric:
+
+- Generated States Comparison
+- Explored States Comparison
+- Memory Allocation Comparison
+- Time Comparison
+- Actions Comparison
+
+**Chart Features:**
+
+- Interactive tooltips showing exact values
+- Zoom and pan capabilities
+- Export individual charts as PNG images
+- Side-by-side bar comparison
+- Responsive sizing
+
+Interpreting Results
+--------------------
+
+Understanding Metrics
+~~~~~~~~~~~~~~~~~~~~~
+
+All metrics use "lower is better" logic:
+
+- **Generated/Explored**: Fewer states means more efficient search
+- **Memory**: Lower memory usage means better resource efficiency
+- **Time**: Faster execution is better
+- **Actions**: Fewer actions means shorter solution path
+- **Solved**: "Yes" is better than "No"
+
+Reading Differences
+~~~~~~~~~~~~~~~~~~~
+
+Differences show how much benchmark1 differs from benchmark2:
+
+.. code-block:: text
+
+   100 vs 120
+   -20 (-16.7%)
+   
+This means:
+- benchmark1 value: 100
+- benchmark2 value: 120  
+- benchmark1 is 20 units lower (better)
+- This is a 16.7% improvement
+
+Example Workflow
+----------------
+
+1. Run two benchmarks:
+
+   .. code-block:: bash
+
+      masbench benchmark --name astar-optimized
+      masbench benchmark --name astar-baseline
+
+2. Compare them:
+
+   .. code-block:: bash
+
+      masbench compare astar-optimized astar-baseline
+
+3. Open the generated HTML report in your browser
+
+4. If you want to see the opposite perspective:
+
+   .. code-block:: bash
+
+      masbench compare astar-baseline astar-optimized
 
 .. seealso::
    - For running benchmarks, see the :doc:`running_benchmarks` guide

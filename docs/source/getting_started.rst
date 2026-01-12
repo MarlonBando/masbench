@@ -8,7 +8,7 @@ Installation
 
 To install masbench:
 
-1. Download the appropriate zip file for your OS and processor from the `releases page <https://github.com/MarlonBando/masbench/releases/tag/v1.0.0>`_
+1. Download the appropriate zip file for your OS and processor from the `releases page <https://github.com/MarlonBando/masbench/releases/tag/v1.1.0>`_
 2. Unzip the downloaded file
 3. Add the extracted folder to your system PATH
 
@@ -106,7 +106,8 @@ This is the command used to start your client. This command will be passed to th
 Let's say you run your level with the following commands:
 
 .. code-block:: shell
-    java -jar server/server.jar -l server/levels/SAsoko3_16.lvl -c "python -m project.src.searchclient -greedy --max-memory 1024" -g -s 150 -t 500
+
+   java -jar server/server.jar -l server/levels/SAsoko3_16.lvl -c "python -m project.src.searchclient -greedy --max-memory 1024" -g -s 150 -t 500
 
 What masbench need is just the client command that is the one after the ``-c`` option:
 
