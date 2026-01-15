@@ -41,7 +41,7 @@ You can add a descriptive message to your benchmark run using the ``-m`` or ``--
 
    masbench run algorithm-v2 -m "Testing A* with improved heuristic"
 
-This message helps you remember what changes you were testing when reviewing results later.
+This message is saved alongside your benchmark results and will be displayed when you run ``masbench list``, helping you remember what changes you were testing.
 
 Output Structure
 ----------------
@@ -199,13 +199,31 @@ Managing Your Benchmarks
 Listing Benchmarks
 ~~~~~~~~~~~~~~~~~~
 
-To see all benchmarks in your benchmark folder:
+To see all benchmarks in your benchmark folder with their descriptions:
 
 .. code-block:: bash
 
    masbench list
 
-This shows all benchmark names in your configured benchmark folder. The output excludes the ``comparisons`` folder.
+This displays each benchmark name along with its description (if one was provided via the ``-m`` flag during ``run``).
+
+To show only benchmark names without descriptions:
+
+.. code-block:: bash
+
+   masbench list --name-only
+   # or
+   masbench list -n
+
+Example output with descriptions:
+
+.. code-block:: text
+
+   baseline: Initial implementation without optimizations
+   improved-heuristic: Testing A* with Manhattan distance
+   final-version: Production-ready algorithm
+
+The output excludes the ``comparisons`` and ``summaries`` folders.
 
 Removing Benchmarks
 ~~~~~~~~~~~~~~~~~~~
