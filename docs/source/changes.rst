@@ -3,6 +3,14 @@ Changes
 
 This page documents the changes made to the masbench project over time.
 
+Version 1.2.0
+-------------
+
+**Improvements:**
+
+* **list** - Now displays benchmark descriptions alongside names. Use ``--name-only`` flag to show only names.
+* **run** - Benchmark descriptions are now saved to ``.md`` files for future reference.
+
 Version 1.1.0
 -------------
 
