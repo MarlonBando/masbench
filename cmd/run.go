@@ -83,6 +83,7 @@ func runBenchmark(name string, message string) {
 	err = cmd.Run()
 	if err != nil {
 		fmt.Printf("\033[31mError running benchmark: %v\033[0m\n", err)
+		os.RemoveAll(benchmarkPath)
 		return
 	}
 
@@ -94,6 +95,12 @@ func runBenchmark(name string, message string) {
 	if err != nil {
 		fmt.Printf("\033[31mError parsing log to CSV: %v\033[0m\n", err)
 		return
+	}
+
+	descriptionFilePath := filepath.Join(benchmarkPath, name+".md")
+	err = os.WriteFile(descriptionFilePath, []byte(message), 0644)
+	if err != nil {
+		fmt.Printf("\033[31mError! Couldn't write in %s \n %v\033[0m\n", descriptionFilePath, err)
 	}
 
 	fmt.Printf("\033[32mResults successfully written to %s\033[0m\n", csvOutputPath)
