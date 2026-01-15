@@ -98,7 +98,7 @@ func runBenchmark(name string, message string) {
 	}
 
 	descriptionFilePath := filepath.Join(benchmarkPath, name+".md")
-	err = os.WriteFile(descriptionFilePath, []byte(message), 0644)
+	err = os.WriteFile(descriptionFilePath, []byte(message+"\n"), 0644)
 	if err != nil {
 		fmt.Printf("\033[31mError! Couldn't write in %s \n %v\033[0m\n", descriptionFilePath, err)
 	}
