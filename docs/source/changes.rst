@@ -2,6 +2,10 @@ Changes
 =======
 
 This page documents the changes made to the masbench project over time.
+Version 1.2.1
+-------------
+
+Improvments to the doc
 
 Version 1.2.0
 -------------
