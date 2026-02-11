@@ -8,7 +8,7 @@ Installation
 
 To install masbench:
 
-1. Download the appropriate zip file for your OS and processor from the `releases page <https://github.com/MarlonBando/masbench/releases/tag/v1.2.0>`_
+1. Download the appropriate zip file for your OS and processor from the `releases page <https://github.com/MarlonBando/masbench/releases/tag/v1.2.2>`_
 2. Unzip the downloaded file
 3. Add the extracted folder to your system PATH
 
@@ -20,7 +20,8 @@ Initializing masbench
 To get started with masbench, you need to initialize it in your project. This is done using the ``masbench init`` command.
 
 .. important::
-   It is **highly recommended** to run this command from your project's root directory. This ensures that the ``masbench_config.yml`` file is created in the root folder, making it easier to manage and locate.
+   It is **highly recommended** to run this command from the same directory where you normally run the command to run a level. 
+   This ensures that the ``masbench_config.yml`` file is created in the root folder, making it easier to manage and locate.
 
 .. code-block:: bash
 
