@@ -33,3 +33,4 @@ masbench
 # .vscode/
 
 docs/build/
+dist/

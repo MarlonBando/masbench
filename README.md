@@ -7,6 +7,12 @@ Course information: [Artificial Intelligence and Multi-Agent Systems](https://li
 
 Documentation is available at [https://marlonbando.github.io/masbench/](https://marlonbando.github.io/masbench/)
 
+## How to install masbench
+
+Download masbench latest release at  [https://github.com/MarlonBando/masbench/releases](https://github.com/MarlonBando/masbench/releases)
+
+if the are no release available for your machine build it from source
+
 ## Development Setup
 
 ### Prerequisites
