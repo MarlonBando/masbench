@@ -19,7 +19,7 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 	}
 	defer file.Close()
 
-	levelPattern := regexp.MustCompile(`\[server\]\[info\] Running client on level file: ([^\s]+)`)
+	levelPattern := regexp.MustCompile(`\[server\]\[info\] Running client on level file: (.+)$`)
 	solvedPattern := regexp.MustCompile(`\[server\]\[info\] Level solved: (Yes|No)`)
 	actionsPattern := regexp.MustCompile(`\[server\]\[info\] Actions used: (\d{1,3}(?:,\d{3})*)`)
 	timePattern := regexp.MustCompile(`\[server\]\[info\] Time to solve: ([0-9.]+) seconds`)

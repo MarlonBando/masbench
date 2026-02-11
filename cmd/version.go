@@ -8,8 +8,14 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var embeddedVersion string
+
 func init() {
 	rootCmd.AddCommand(versionCmd)
+}
+
+func SetVersion(version string) {
+	embeddedVersion = version
 }
 
 var versionCmd = &cobra.Command{
@@ -23,6 +29,11 @@ var versionCmd = &cobra.Command{
 }
 
 func getVersion() string {
+	if embeddedVersion != "" {
+		return strings.TrimSpace(embeddedVersion)
+	}
+
+	// Fallback to reading VERSION file (for development)
 	data, err := os.ReadFile("VERSION")
 	if err != nil {
 		return "unknown"
