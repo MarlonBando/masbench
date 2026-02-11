@@ -2,10 +2,17 @@ Changes
 =======
 
 This page documents the changes made to the masbench project over time.
+
+Version 1.2.2
+-------------
+
+* Fixed bug that was breaking the log parsing if a white space was present in the path of a level
+* Fixed version unknown bug
+
 Version 1.2.1
 -------------
 
-Improvments to the doc
+* Improvments to the doc
 
 Version 1.2.0
 -------------
