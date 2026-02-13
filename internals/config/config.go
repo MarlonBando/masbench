@@ -5,8 +5,8 @@ import (
 	"os"
 	"sync"
 
-	"masbench/internals/models"
 	"gopkg.in/yaml.v3"
+	"masbench/internals/models"
 )
 
 var (
@@ -47,5 +47,22 @@ func loadConfig(filePath ...string) {
 	if err := yaml.Unmarshal(data, instance); err != nil {
 		fmt.Printf("\033[31mError parsing config file: %v\033[0m\n", err)
 		os.Exit(1)
+	}
+
+	// This is necessary for people that already initialize their masbench
+	// prior the algo update, this will automatically add the AlgorithmFlagFormat
+	// to their configuration
+	if instance.AlgorithmFlagFormat == "" {
+		defaultFormat := models.DefaultConfiguration.AlgorithmFlagFormat
+		instance.AlgorithmFlagFormat = defaultFormat
+
+		if isDefaultPath {
+			appendLine := fmt.Sprintf("AlgorithmFlagFormat: %s\n", defaultFormat)
+			// Ensure there's a newline before the new field
+			if len(data) > 0 && data[len(data)-1] != '\n' {
+				appendLine = "\n" + appendLine
+			}
+			_ = os.WriteFile(configPath, append(data, []byte(appendLine)...), 0644)
+		}
 	}
 }

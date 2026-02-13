@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 
 	"masbench/internals/config"
 	"masbench/internals/parsers"
@@ -14,25 +15,68 @@ import (
 )
 
 var message string
+var algorithm string
 
 func init() {
 	rootCmd.AddCommand(runCmd)
 	runCmd.Flags().StringVarP(&message, "message", "m", "", "Add a note to the run")
+	runCmd.Flags().StringVarP(&algorithm, "algorithm", "a", "", "Algorithm to use for this run")
 }
 
 var runCmd = &cobra.Command{
 	Use:   "run [benchmark-name]",
 	Short: "Run a benchmark with masbench",
-	Long:  `This command executes a benchmark using masbench. It requires a configuration file to be present in the current directory.`,
-	Args:  cobra.ExactArgs(1),
+	Long: `Execute a benchmark using masbench. Requires a configuration file (masbench_config.yml) to be present in the current directory.
+
+DESCRIPTION
+       The run command executes benchmarks against your client implementation.
+       It spawns a server process that runs your client against a set of
+       test levels, collecting performance metrics and logs.
+
+       Before running, ensure your configuration file is properly set up with
+       the server path, levels directory, and client command.
+
+OPTIONS
+       -a <algorithm>, --algorithm=<algorithm>
+           Specify the algorithm to use for this run (e.g., bfs, dfs, greedy,
+           astar). The algorithm argument will be appended to your client
+           command using the format defined by AlgorithmFlagFormat in the
+           configuration file.
+
+           IMPORTANT: Remove any algorithm flags from your ClientCommand in
+           the configuration file before using this option to avoid conflicts.
+
+           EXAMPLE
+               If your ClientCommand is:
+                   "python -m searchclient.searchclient -bfs"
+               Remove "-bfs" and use:
+                   masbench run my-benchmark -a bfs
+
+       -m <message>, --message=<message>
+           Add a descriptive note or comment to the benchmark run. This
+           message will be saved in the benchmark results for reference.
+
+           Useful for documenting the purpose of a run, configuration
+           changes, or any other relevant information about the benchmark.
+
+EXAMPLES
+       Run a benchmark named "test-run":
+           masbench run test-run
+
+       Run with a specific algorithm:
+           masbench run astar-test -a astar
+
+       Run with a descriptive message:
+           masbench run baseline -m "Baseline performance test"`,
+	Args: cobra.ExactArgs(1),
 	Run: func(cmd *cobra.Command, args []string) {
 		benchmarkName := args[0]
 		fmt.Printf("Running benchmark: %s\n", benchmarkName)
-		runBenchmark(benchmarkName, message)
+		runBenchmark(benchmarkName, message, algorithm)
 	},
 }
 
-func runBenchmark(name string, message string) {
+func runBenchmark(name, message, algorithm string) {
 	cfg := config.GetConfig()
 
 	// Create benchmark folder if it does not exist
@@ -68,6 +112,14 @@ func runBenchmark(name string, message string) {
 		return
 	}
 	defer logFile.Close()
+
+	if algorithm != "" {
+		if strings.Count(algorithm, "%s") != 1 {
+			fmt.Println("\033[31mError in your configuration: The parameter AlgorithmFlagFormat in your masbench_config.yml must contain only one %s\033[0m")
+			return
+		}
+		cfg.ClientCommand += " " + fmt.Sprintf(cfg.AlgorithmFlagFormat, algorithm)
+	}
 
 	cmd := exec.Command("java", "-jar", cfg.ServerPath,
 		"-l", cfg.LevelsDir,

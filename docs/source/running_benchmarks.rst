@@ -32,6 +32,53 @@ The benchmark name is used to:
 .. important::
    Benchmark names must be unique. If you try to run a benchmark with a name that already exists, masbench will display an error and exit.
 
+Specifying an Algorithm
+~~~~~~~~~~~~~~~~~~~~~~~
+
+You can specify which algorithm to use for a benchmark run using the ``-a`` or ``--algorithm`` flag:
+
+.. code-block:: bash
+
+   masbench run astar-test -a astar
+
+The algorithm argument will be appended to your client command using the format defined by ``AlgorithmFlagFormat`` in the configuration file.
+
+.. warning::
+   When using the ``-a`` flag, you must remove any existing algorithm flags from your ``ClientCommand`` in the configuration file. For example, if your ``ClientCommand`` is ``"python -m searchclient.searchclient -bfs"``, you should remove ``-bfs`` and let the ``-a`` flag handle it instead.
+
+**How It Works**
+
+Here is a complete example showing how the configuration works together::
+
+   # masbench_config.yml
+   ClientCommand: "python -m searchclient.searchclient"
+   AlgorithmFlagFormat: "-%s"
+
+When you run::
+
+   masbench run my-benchmark -a bfs
+
+The final client command executed will be::
+
+   python -m searchclient.searchclient -bfs
+
+**Custom Algorithm Flag Format**
+
+If your client accepts the algorithm flag in a different format, you can customize ``AlgorithmFlagFormat`` in your configuration file. For example, if your client uses ``--algo <algorithm>``::
+
+   # masbench_config.yml
+   ClientCommand: "python -m searchclient.searchclient"
+   AlgorithmFlagFormat: "--algo %s"
+
+When you run::
+
+   masbench run my-benchmark -a bfs
+
+The final client command executed will be::
+
+   python -m searchclient.searchclient --algo bfs
+
+
 Adding Notes to Your Benchmark
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -107,7 +154,7 @@ When masbench detects these strings in your client output, it will parse the val
    
       print("#Explored: 123", flush=True)
       print("#Generated: 1039", flush=True)
-      print("#Alloc: 200", flush=True)
+      print("#Alloc: 200 MB", flush=True)
    
    This will produce output that masbench can parse:
    
@@ -115,7 +162,7 @@ When masbench detects these strings in your client output, it will parse the val
    
       [client][message] #Explored: 156
       [client][message] #Generated: 234
-      [client][message] #Alloc: 3072
+      [client][message] #Alloc: 3072 MB
 
 Example Results
 ~~~~~~~~~~~~~~~

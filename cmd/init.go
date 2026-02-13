@@ -58,15 +58,7 @@ func runInit() {
 }
 
 func createDefaultConfig(basePath string) {
-	defaultConfig := models.Config{
-		ServerPath:      "path/to/your/server_executable",
-		LevelsDir:       "path/to/your/levels_directory",
-		BenchmarkFolder: "benchmarks",
-		ClientCommand:   "your_client_command --level {level_path}",
-		Timeout:         180,
-	}
-
-	writeConfig(basePath, &defaultConfig)
+	writeConfig(basePath, &models.DefaultConfiguration)
 	fmt.Printf("%sCreated default config file at %s. Please edit it manually.%s\n", colorGreen, filepath.Join(basePath, "masbench_config.yml"), colorReset)
 }
 
@@ -78,7 +70,7 @@ func interactiveConfigCreation(basePath string) {
 	levelsDir := askForLevelsDir(reader)
 	benchmarkFolder := askForBenchmarkFolder(reader)
 	clientCommand := askForClientCommand(reader)
-	
+
 	newConfig := models.Config{
 		ServerPath:      serverPath,
 		LevelsDir:       levelsDir,
