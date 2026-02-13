@@ -10,7 +10,7 @@ type Config struct {
 	AlgorithmFlagFormat string `yaml:"AlgorithmFlagFormat"`
 }
 
-var DEFAULT_CONFIGURATION Config = Config{
+var DefaultConfiguration Config = Config{
 	ServerPath:          "path/to/your/server_executable",
 	LevelsDir:           "path/to/your/levels_directory",
 	BenchmarkFolder:     "benchmarks",

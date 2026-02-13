@@ -53,7 +53,7 @@ func loadConfig(filePath ...string) {
 	// prior the algo update, this will automatically add the AlgorithmFlagFormat
 	// to their configuration
 	if instance.AlgorithmFlagFormat == "" {
-		defaultFormat := models.DEFAULT_CONFIGURATION.AlgorithmFlagFormat
+		defaultFormat := models.DefaultConfiguration.AlgorithmFlagFormat
 		instance.AlgorithmFlagFormat = defaultFormat
 
 		if isDefaultPath {

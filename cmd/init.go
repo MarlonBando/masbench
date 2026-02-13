@@ -58,7 +58,7 @@ func runInit() {
 }
 
 func createDefaultConfig(basePath string) {
-	writeConfig(basePath, &models.DEFAULT_CONFIGURATION)
+	writeConfig(basePath, &models.DefaultConfiguration)
 	fmt.Printf("%sCreated default config file at %s. Please edit it manually.%s\n", colorGreen, filepath.Join(basePath, "masbench_config.yml"), colorReset)
 }
 
