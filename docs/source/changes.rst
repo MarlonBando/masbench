@@ -3,6 +3,13 @@ Changes
 
 This page documents the changes made to the masbench project over time.
 
+Version (to be defined)
+-----------------------
+
+**New Features:**
+
+* **run** - Added ``-a`` / ``--algorithm`` flag to specify the algorithm to use during benchmark runs. This allows you to dynamically select algorithms (e.g., bfs, dfs, greedy, astar) without modifying your configuration file.
+
 Version 1.2.2
 -------------
 
