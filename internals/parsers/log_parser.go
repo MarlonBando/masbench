@@ -23,10 +23,10 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 	solvedPattern := regexp.MustCompile(`\[server\]\[info\] Level solved: (Yes|No)`)
 	actionsPattern := regexp.MustCompile(`\[server\]\[info\] Actions used: (\d{1,3}(?:,\d{3})*)`)
 	timePattern := regexp.MustCompile(`\[server\]\[info\] Time to solve: ([0-9.]+) seconds`)
-	exploredPattern := regexp.MustCompile(`\[client\]\[message\]\s*Explored:\s*(\d+)`)
-	generatedPattern := regexp.MustCompile(`\[client\]\[message\]\s*Generated:\s*(\d+)`)
-	memoryPattern := regexp.MustCompile(`\[client\]\[message\]\s*Alloc:\s*([0-9.]+)\s*MB`)
-	maxMemoryPattern := regexp.MustCompile(`\[client\]\[message\]\s*MaxAlloc:\s*([0-9.]+)\s*MB`)
+	exploredPattern := regexp.MustCompile(`#Expanded:\s*([\d,]+)`)
+	generatedPattern := regexp.MustCompile(`#Generated:\s*([\d,]+)`)
+	memoryPattern := regexp.MustCompile(`Alloc:\s*([0-9.]+)\s*MB`)
+	maxMemoryPattern := regexp.MustCompile(`MaxAlloc:\s*([0-9.]+)\s*MB`)
 
 	var logs []models.LevelMetrics
 	var currentLevel *models.LevelMetrics
@@ -54,10 +54,10 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 				currentLevel.Time = timeMatch[1]
 			}
 			if exploredMatch := exploredPattern.FindStringSubmatch(line); exploredMatch != nil {
-				currentLevel.Explored = exploredMatch[1]
+				currentLevel.Explored = strings.ReplaceAll(exploredMatch[1], ",", "")
 			}
 			if generatedMatch := generatedPattern.FindStringSubmatch(line); generatedMatch != nil {
-				currentLevel.Generated = generatedMatch[1]
+				currentLevel.Generated = strings.ReplaceAll(generatedMatch[1], ",", "")
 			}
 			if memoryMatch := memoryPattern.FindStringSubmatch(line); memoryMatch != nil {
 				currentLevel.MemoryAlloc = memoryMatch[1]
