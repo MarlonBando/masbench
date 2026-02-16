@@ -22,7 +22,7 @@ func ParseLogToCSV(logFilePath string, outputFilePath string) error {
 	levelPattern := regexp.MustCompile(`\[server\]\[info\] Running client on level file: (.+)$`)
 	solvedPattern := regexp.MustCompile(`\[server\]\[info\] Level solved: (Yes|No)`)
 	actionsPattern := regexp.MustCompile(`\[server\]\[info\] Actions used: (\d{1,3}(?:,\d{3})*)`)
-	timePattern := regexp.MustCompile(`\[server\]\[info\] Time to solve: ([0-9.]+) seconds`)
+	timePattern := regexp.MustCompile(`\[server\]\[info\] Time to solve: (\d{1,3}(?:,\d{3})*(?:\.\d+)?)`)
 	exploredPattern := regexp.MustCompile(`\[client\]\[message\]\s*Explored:\s*(\d+)`)
 	generatedPattern := regexp.MustCompile(`\[client\]\[message\]\s*Generated:\s*(\d+)`)
 	memoryPattern := regexp.MustCompile(`\[client\]\[message\]\s*Alloc:\s*([0-9.]+)\s*MB`)

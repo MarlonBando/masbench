@@ -3,8 +3,8 @@ Changes
 
 This page documents the changes made to the masbench project over time.
 
-Version 1.3.0
------------------------
+Version 1.3.0 
+-------------
 
 **New Features:**
 
