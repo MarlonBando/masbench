@@ -3,12 +3,16 @@ Changes
 
 This page documents the changes made to the masbench project over time.
 
-Version (to be defined)
+Version 1.3.0
 -----------------------
 
 **New Features:**
 
 * **run** - Added ``-a`` / ``--algorithm`` flag to specify the algorithm to use during benchmark runs. This allows you to dynamically select algorithms (e.g., bfs, dfs, greedy, astar) without modifying your configuration file.
+
+**Bug fix**
+
+* fixed bug where value of `Time to solve:` above `1000.000 s` were paresed as 1 due to server formatting with comma. 
 
 Version 1.2.2
 -------------
