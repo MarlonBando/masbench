@@ -10,9 +10,9 @@ Version 1.3.0
 
 * **run** - Added ``-a`` / ``--algorithm`` flag to specify the algorithm to use during benchmark runs. This allows you to dynamically select algorithms (e.g., bfs, dfs, greedy, astar) without modifying your configuration file.
 
-**Bug Fix**
+**Bug fix**
 
-* Fixed the bug that when the `Time to solve` output from the server was above 1000.000 seconds the parsing was breaking showing only `1`  
+* fixed bug where value of `Time to solve:` above `1000.000 s` were paresed as 1 due to server formatting with comma. 
 
 Version 1.2.2
 -------------
