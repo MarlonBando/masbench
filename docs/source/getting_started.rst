@@ -8,7 +8,7 @@ Installation
 
 To install masbench:
 
-1. Download the appropriate zip file for your OS and processor from the `releases page <https://github.com/MarlonBando/masbench/releases/tag/v1.2.2>`_
+1. Download the appropriate zip file for your OS and processor from the `releases page <https://github.com/MarlonBando/masbench/releases/tag/v1.3.0>`_
 2. Unzip the downloaded file
 3. Add the extracted folder to your system PATH
 
