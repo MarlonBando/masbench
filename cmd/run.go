@@ -115,7 +115,7 @@ func runBenchmark(name, message, algorithm string) {
 
 	if algorithm != "" {
 		if strings.Count(cfg.AlgorithmFlagFormat, "%s") != 1 {
-			fmt.Println("\033[31mError in your configuration: The parameter AlgorithmFlagFormat in your masbench_config.yml must contain only one %s'\033[0m")
+			fmt.Printf("\033[31mError in your configuration: The parameter AlgorithmFlagFormat in your masbench_config.yml must contain only one %%s'\033[0m\n")
 			return
 		}
 		cfg.ClientCommand += " " + fmt.Sprintf(cfg.AlgorithmFlagFormat, algorithm)
