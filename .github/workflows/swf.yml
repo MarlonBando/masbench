@@ -1,0 +1,23 @@
+# swf: personal software factory. https://github.com/MarlonBando/swf
+# Adding the `swf:ready` label to an issue starts the worker, then the reviewer.
+name: swf
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  factory:
+    if: github.event.label.name == 'swf:ready'
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    uses: MarlonBando/swf/.github/workflows/factory.yml@main
+    with:
+      issue_number: ${{ github.event.issue.number }}
+      test_command: go test ./...
+      go_version_file: go.mod
+    secrets:
+      CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
